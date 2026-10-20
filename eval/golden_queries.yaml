@@ -1,0 +1,49 @@
+# Golden questions, scored by scripts/eval_retrieval.py.
+#
+# `expect` is the document that owns the answer; `also_ok` lists ones that legitimately restate it.
+# `must_not_return_collection` marks a question whose old answer is wrong now — the eval reports
+# whether that collection would have reached the top results without the default filter.
+# `answer` is recorded so "the wrong ticket came back" and "the right ticket came back and is wrong"
+# stay distinguishable.
+#
+# Phrased the way people ask, which is deliberately not the tickets' own wording.
+
+queries:
+  - q: a customer says they received the same webhook twice
+    expect: NOTIFY-101
+    answer: Retries reuse X-Acme-Event-Id; receivers must de-duplicate on it.
+
+  - q: which client errors do we still retry
+    expect: NOTIFY-118
+    answer: 408 and 429. Every other 4xx ends the delivery.
+
+  - q: how many times will we try a delivery before giving up
+    expect: NOTIFY-118
+    must_not_return_collection: archive
+    answer: Three attempts in total. (The archive says "forever", which was true in 2023.)
+
+  - q: receiver rejects our signatures because their server time is wrong
+    expect: NOTIFY-131
+    answer: Signatures are accepted within five minutes of the receiver's clock; they need NTP.
+
+  - q: steps to change the HMAC key
+    expect: NOTIFY-140
+    also_ok: [NOTIFY-127]
+    answer: Move the current secret to NOTIFY_PREVIOUS_SIGNING_SECRET, set the new one, remove the old later.
+
+  - q: digest arrived twice after daylight saving
+    expect: NOTIFY-152
+    answer: The schedule used local time; it now runs on UTC.
+
+  - q: how do we ship a release to production
+    expect: NOTIFY-145
+    must_not_return_collection: archive
+    answer: Tag the commit; the pipeline promotes the staging build. (The archive describes SFTP by hand.)
+
+  - q: what happens to events bigger than 256 KB
+    expect: NOTIFY-109
+    answer: Rejected at intake with 413, never queued.
+
+  - q: bad gateway errors right after deploying
+    expect: NOTIFY-163
+    answer: The load balancer kept routing to the old instance; a 30 second drain fixed it.

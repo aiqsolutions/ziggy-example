@@ -1,0 +1,18 @@
+# What each ingest pulls, and how it labels what it pulls.
+
+jira:
+  # Name projects explicitly, so a new project entering the corpus is a decision rather than an accident.
+  jql: project = NOTIFY ORDER BY created DESC
+
+  # Tickets created before this date land in the `archive` collection: indexed, but only returned when
+  # someone asks for the archive by name. Old tickets are accurate about how things used to work, which
+  # is exactly why they must not answer questions about how things work now.
+  archive_before: "2024-07-01"
+
+  # Shorter bodies are skipped. Measured, not guessed: run `ingest_jira.py --measure` and set this in the
+  # gap between the longest placeholder and the shortest ticket worth keeping. Too high, and it silently
+  # drops the most precise content you have — a one-line root cause is short *because* it is precise.
+  min_body: 60
+
+  exclude_types:
+    - Test Case   # high volume, near-zero prose

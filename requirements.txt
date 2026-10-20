@@ -1,0 +1,2 @@
+# Everything else is the Python standard library.
+PyYAML>=6

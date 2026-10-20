@@ -1,0 +1,443 @@
+[
+ {
+  "key": "NOTIFY-12",
+  "fields": {
+   "summary": "Release checklist",
+   "description": "h2. Process\n# Build the release on your machine with {{make dist}}\n# Copy the archive to the app server over SFTP\n# Restart the service by hand and watch the log for a minute\n# Record the version in the release spreadsheet\n\nReleases to production happen on Thursdays, after the change board approves them.",
+   "labels": [],
+   "issuetype": {
+    "name": "Story"
+   },
+   "status": {
+    "name": "Done"
+   },
+   "project": {
+    "key": "NOTIFY"
+   },
+   "created": "2023-02-08T10:00:00.000+0000",
+   "updated": "2023-02-08T16:30:00.000+0000",
+   "comment": {
+    "total": 0,
+    "comments": []
+   }
+  }
+ },
+ {
+  "key": "NOTIFY-30",
+  "fields": {
+   "summary": "Failed webhooks are retried forever",
+   "description": "A receiver that is down for a weekend gets hammered: we retry every failed delivery every 30 seconds, with no limit on how many times we try before giving up.",
+   "labels": [],
+   "issuetype": {
+    "name": "Bug"
+   },
+   "status": {
+    "name": "Done"
+   },
+   "project": {
+    "key": "NOTIFY"
+   },
+   "created": "2023-06-20T10:00:00.000+0000",
+   "updated": "2023-06-20T16:30:00.000+0000",
+   "comment": {
+    "total": 1,
+    "comments": [
+     {
+      "author": {
+       "displayName": "Dana"
+      },
+      "created": "2023-06-22T09:00:00.000+0000",
+      "body": "We'll add a limit later. For now a delivery keeps being retried until the receiver answers 2xx."
+     }
+    ]
+   }
+  }
+ },
+ {
+  "key": "NOTIFY-101",
+  "fields": {
+   "summary": "Receivers get duplicate deliveries after a timeout",
+   "description": "h2. What happens\nA receiver takes longer than our 10 second timeout to answer, but processes the event anyway. We count the attempt as failed and send it again, so the receiver sees the same event twice.\n\nh2. Impact\nTwo customers reported double-processed orders downstream of our webhooks.",
+   "labels": [],
+   "issuetype": {
+    "name": "Bug"
+   },
+   "status": {
+    "name": "Done"
+   },
+   "project": {
+    "key": "NOTIFY"
+   },
+   "created": "2025-03-14T10:00:00.000+0000",
+   "updated": "2025-03-14T16:30:00.000+0000",
+   "comment": {
+    "total": 2,
+    "comments": [
+     {
+      "author": {
+       "displayName": "Priya"
+      },
+      "created": "2025-03-15T09:00:00.000+0000",
+      "body": "Every delivery already carries {{X-Acme-Event-Id}}, and a retry reuses it. Receivers that de-duplicate on that header are unaffected."
+     },
+     {
+      "author": {
+       "displayName": "Sam"
+      },
+      "created": "2025-03-17T09:00:00.000+0000",
+      "body": "Agreed. Not changing the timeout \u2014 a slow receiver would just move the problem. Updating the integration guide: receivers must treat a repeated event id as already processed. Closing as working as designed, with a docs change."
+     }
+    ]
+   }
+  }
+ },
+ {
+  "key": "NOTIFY-109",
+  "fields": {
+   "summary": "Large events never reach the receiver",
+   "description": "Events larger than 256 KB are rejected at intake with HTTP 413 and never queued, so the receiver never sees them. The sender gets the 413 synchronously.\n\nEvents larger than 256 KB are rejected at intake with HTTP 413 and never queued so the receiver never sees them The sender gets the 413 synchronously",
+   "labels": [],
+   "issuetype": {
+    "name": "Bug"
+   },
+   "status": {
+    "name": "Done"
+   },
+   "project": {
+    "key": "NOTIFY"
+   },
+   "created": "2025-04-02T10:00:00.000+0000",
+   "updated": "2025-04-02T16:30:00.000+0000",
+   "comment": {
+    "total": 1,
+    "comments": [
+     {
+      "author": {
+       "displayName": "Jordan"
+      },
+      "created": "2025-04-03T09:00:00.000+0000",
+      "body": "Working as designed. The limit is {{NOTIFY_MAX_BODY}} if a customer genuinely needs more."
+     }
+    ]
+   }
+  }
+ },
+ {
+  "key": "NOTIFY-118",
+  "fields": {
+   "summary": "Stop retrying 4xx responses",
+   "description": "|*User need*|As a receiver, I don't want a request I rejected sent to me again, because a 4xx means I rejected it on purpose.|\n|*Acceptance criteria*|Only timeouts, connection errors, 5xx, 408 and 429 are retried. Any other 4xx marks the delivery dead immediately. A delivery is attempted at most three times in total.|\n|*Out of scope*|Changing the backoff schedule.|\n|*Risks*| |\n|*Dependencies*| |\n|*Notes*| |",
+   "labels": [],
+   "issuetype": {
+    "name": "Story"
+   },
+   "status": {
+    "name": "Done"
+   },
+   "project": {
+    "key": "NOTIFY"
+   },
+   "created": "2025-05-06T10:00:00.000+0000",
+   "updated": "2025-05-06T16:30:00.000+0000",
+   "comment": {
+    "total": 1,
+    "comments": [
+     {
+      "author": {
+       "displayName": "Jordan"
+      },
+      "created": "2025-05-28T09:00:00.000+0000",
+      "body": "Shipped in 2.4. The failed list on the dashboard now shows the status code that ended each delivery."
+     }
+    ]
+   }
+  }
+ },
+ {
+  "key": "NOTIFY-124",
+  "fields": {
+   "summary": "Digest opt-out per subscriber",
+   "description": "|*User need*| |\n|*Acceptance criteria*| |\n|*Out of scope*| |\n|*Risks*| |\n|*Dependencies*| |\n|*Notes*| |",
+   "labels": [],
+   "issuetype": {
+    "name": "Story"
+   },
+   "status": {
+    "name": "To Do"
+   },
+   "project": {
+    "key": "NOTIFY"
+   },
+   "created": "2025-06-11T10:00:00.000+0000",
+   "updated": "2025-06-11T16:30:00.000+0000",
+   "comment": {
+    "total": 0,
+    "comments": []
+   }
+  }
+ },
+ {
+  "key": "NOTIFY-127",
+  "fields": {
+   "summary": "Signature checks failed during secret rotation",
+   "description": "Root cause: the runbook set the new secret before receivers had it. Fixed the order of the steps.",
+   "labels": [],
+   "issuetype": {
+    "name": "Bug"
+   },
+   "status": {
+    "name": "Done"
+   },
+   "project": {
+    "key": "NOTIFY"
+   },
+   "created": "2025-06-30T10:00:00.000+0000",
+   "updated": "2025-06-30T16:30:00.000+0000",
+   "comment": {
+    "total": 0,
+    "comments": []
+   }
+  }
+ },
+ {
+  "key": "NOTIFY-131",
+  "fields": {
+   "summary": "Signatures rejected for one receiver in UTC+13",
+   "description": "h2. Symptom\nEvery delivery to one customer fails verification with \"timestamp outside tolerance\".\n\nh2. Cause\nTheir server clock was seven minutes fast. A signature is only accepted within five minutes of the receiver's own clock, in either direction, so a drifting clock rejects valid deliveries. The timezone is a red herring: the signed timestamp is Unix seconds.",
+   "labels": [],
+   "issuetype": {
+    "name": "Bug"
+   },
+   "status": {
+    "name": "Done"
+   },
+   "project": {
+    "key": "NOTIFY"
+   },
+   "created": "2025-08-19T10:00:00.000+0000",
+   "updated": "2025-08-19T16:30:00.000+0000",
+   "comment": {
+    "total": 1,
+    "comments": [
+     {
+      "author": {
+       "displayName": "Priya"
+      },
+      "created": "2025-08-20T09:00:00.000+0000",
+      "body": "Asked them to enable NTP. Adding \"keep your clock in sync\" to the receiver checklist."
+     }
+    ]
+   }
+  }
+ },
+ {
+  "key": "NOTIFY-133",
+  "fields": {
+   "summary": "Load test the intake API",
+   "description": "TBD",
+   "labels": [],
+   "issuetype": {
+    "name": "Task"
+   },
+   "status": {
+    "name": "To Do"
+   },
+   "project": {
+    "key": "NOTIFY"
+   },
+   "created": "2025-09-01T10:00:00.000+0000",
+   "updated": "2025-09-01T16:30:00.000+0000",
+   "comment": {
+    "total": 0,
+    "comments": []
+   }
+  }
+ },
+ {
+  "key": "NOTIFY-140",
+  "fields": {
+   "summary": "Rotate the webhook signing secret",
+   "description": "# Generate a new secret.\n# Move the current secret to {{NOTIFY_PREVIOUS_SIGNING_SECRET}} and set the new one as {{NOTIFY_SIGNING_SECRET}}. Both are accepted while both are set.\n# Tell receivers, and give them two weeks.\n# Remove the previous secret.",
+   "labels": [],
+   "issuetype": {
+    "name": "Task"
+   },
+   "status": {
+    "name": "Done"
+   },
+   "project": {
+    "key": "NOTIFY"
+   },
+   "created": "2025-09-03T10:00:00.000+0000",
+   "updated": "2025-09-03T16:30:00.000+0000",
+   "comment": {
+    "total": 1,
+    "comments": [
+     {
+      "author": {
+       "displayName": "Sam"
+      },
+      "created": "2025-09-20T09:00:00.000+0000",
+      "body": "Done for this quarter. Next rotation is due in March."
+     }
+    ]
+   }
+  }
+ },
+ {
+  "key": "NOTIFY-145",
+  "fields": {
+   "summary": "Releases go through the pipeline",
+   "description": "h2. How a release ships now\nMerging to {{main}} builds and deploys to staging automatically. To release to production, tag the commit {{vX.Y.Z}}; the pipeline promotes the same build once the staging smoke tests pass. Nobody copies files to a server by hand any more.\n\nh2. Rollback\nRe-tag the previous version and the pipeline redeploys it. Details in the [pipeline runbook|https://wiki.example.com/release-pipeline].",
+   "labels": [],
+   "issuetype": {
+    "name": "Task"
+   },
+   "status": {
+    "name": "Done"
+   },
+   "project": {
+    "key": "NOTIFY"
+   },
+   "created": "2025-10-01T10:00:00.000+0000",
+   "updated": "2025-10-01T16:30:00.000+0000",
+   "comment": {
+    "total": 0,
+    "comments": []
+   }
+  }
+ },
+ {
+  "key": "NOTIFY-152",
+  "fields": {
+   "summary": "Daily digest sent twice when the clocks changed",
+   "description": "On the day daylight saving ended, every subscriber got two digests an hour apart. The schedule compared against local time, and 01:00 to 02:00 happened twice.",
+   "labels": [],
+   "issuetype": {
+    "name": "Bug"
+   },
+   "status": {
+    "name": "Done"
+   },
+   "project": {
+    "key": "NOTIFY"
+   },
+   "created": "2025-11-03T10:00:00.000+0000",
+   "updated": "2025-11-03T16:30:00.000+0000",
+   "comment": {
+    "total": 1,
+    "comments": [
+     {
+      "author": {
+       "displayName": "Jordan"
+      },
+      "created": "2025-11-04T09:00:00.000+0000",
+      "body": "The schedule now runs on UTC \u2014 {{NOTIFY_DIGEST_HOUR}} is a UTC hour. Fixed in 2.6."
+     }
+    ]
+   }
+  }
+ },
+ {
+  "key": "NOTIFY-160",
+  "fields": {
+   "summary": "Staging cannot reach the queue",
+   "description": "Staging can't reach the queue since the config change. Here is the block from the service config:\n{code}\nqueue_host = staging-queue\npassword = \"correct-horse-battery-staple\"\n{code}",
+   "labels": [],
+   "issuetype": {
+    "name": "Bug"
+   },
+   "status": {
+    "name": "Done"
+   },
+   "project": {
+    "key": "NOTIFY"
+   },
+   "created": "2026-01-21T10:00:00.000+0000",
+   "updated": "2026-01-21T16:30:00.000+0000",
+   "comment": {
+    "total": 0,
+    "comments": []
+   }
+  }
+ },
+ {
+  "key": "NOTIFY-163",
+  "fields": {
+   "summary": "502s for a minute after every deploy",
+   "description": "Intake returns 502 for about a minute after each deploy. The load balancer at 10.0.4.17 keeps sending traffic to the old instance until its health check fails.",
+   "labels": [],
+   "issuetype": {
+    "name": "Bug"
+   },
+   "status": {
+    "name": "Done"
+   },
+   "project": {
+    "key": "NOTIFY"
+   },
+   "created": "2026-02-10T10:00:00.000+0000",
+   "updated": "2026-02-10T16:30:00.000+0000",
+   "comment": {
+    "total": 1,
+    "comments": [
+     {
+      "author": {
+       "displayName": "Sam"
+      },
+      "created": "2026-02-12T09:00:00.000+0000",
+      "body": "Added a 30 second drain before the old instance stops. No 502s on the last three deploys."
+     }
+    ]
+   }
+  }
+ },
+ {
+  "key": "NOTIFY-166",
+  "fields": {
+   "summary": "Customer escalation about delivery terms",
+   "description": "Summary of the escalation call and the commercial terms discussed is attached.",
+   "labels": [
+    "restricted"
+   ],
+   "issuetype": {
+    "name": "Bug"
+   },
+   "status": {
+    "name": "Done"
+   },
+   "project": {
+    "key": "NOTIFY"
+   },
+   "created": "2026-03-02T10:00:00.000+0000",
+   "updated": "2026-03-02T16:30:00.000+0000",
+   "comment": {
+    "total": 0,
+    "comments": []
+   }
+  }
+ },
+ {
+  "key": "NOTIFY-170",
+  "fields": {
+   "summary": "TEST CASE: Stop retrying 4xx responses",
+   "description": "See NOTIFY-118.",
+   "labels": [],
+   "issuetype": {
+    "name": "Test Case"
+   },
+   "status": {
+    "name": "Done"
+   },
+   "project": {
+    "key": "NOTIFY"
+   },
+   "created": "2026-03-05T10:00:00.000+0000",
+   "updated": "2026-03-05T16:30:00.000+0000",
+   "comment": {
+    "total": 0,
+    "comments": []
+   }
+  }
+ }
+]
